@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Broke & Booked — Travel the World on $10</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#07090d;--cream:#f5f0e8;--rust:#c1440e;--gold:#d4a843;
+  --sage:#4a7a55;--sky:#060c16;--paper:#faf7f2;--muted:rgba(245,240,232,.5);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--sky);color:var(--cream);font-family:'DM Sans',sans-serif;overflow-x:hidden;cursor:none;}
+
+/* ── CURSOR ── */
+.cur{position:fixed;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference;transition:width .2s,height .2s;}
+.cur-ring{position:fixed;width:32px;height:32px;border:1px solid rgba(212,168,67,.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
+
+/* ── PLANE ── */
+#plane{position:fixed;z-index:400;pointer-events:none;top:12vh;left:-150px;
+  animation:fly 22s linear infinite;
+  filter:drop-shadow(0 4px 18px rgba(212,168,67,.5));}
+@keyframes fly{
+  0%{left:-150px;top:12vh;}15%{top:8vh;}35%{top:18vh;}55%{top:6vh;}75%{top:14vh;}100%{left:calc(100vw + 150px);top:10vh;}
+}
+.psvg{width:100px;animation:bob 3.5s ease-in-out infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(2deg);}50%{transform:translateY(-9px) rotate(-1deg);}}
+
+#trail{position:fixed;inset:0;pointer-events:none;z-index:399;overflow:hidden;}
+.tdot{position:absolute;width:3px;height:3px;background:rgba(212,168,67,.55);border-radius:50%;animation:tfade 2.8s ease forwards;}
+@keyframes tfade{0%{opacity:.8;}100%{opacity:0;transform:scale(.1);}}
+
+/* ── STARS ── */
+#stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twink var(--d) ease-in-out infinite var(--dl);}
+@keyframes twink{0%,100%{opacity:var(--o);}50%{opacity:.05;}}
+
+/* ── CLOUDS ── */
+#clouds{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;}
+.cl{position:absolute;background:rgba(255,255,255,.03);border-radius:80px;filter:blur(25px);}
+.cl1{width:280px;height:70px;top:10vh;left:-280px;animation:cdrift 38s linear infinite;}
+.cl2{width:180px;height:55px;top:22vh;left:-180px;animation:cdrift 52s linear 12s infinite;}
+.cl3{width:360px;height:80px;top:4vh;left:-360px;animation:cdrift 30s linear 6s infinite;opacity:.6;}
+@keyframes cdrift{from{left:-400px;}to{left:calc(100vw+400px);}}
+
+/* ── STICKY NAV ── */
+#topnav{
+  position:fixed;top:0;left:0;right:0;z-index:800;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:.9rem 6vw;
+  background:rgba(6,12,22,.0);
+  border-bottom:1px solid transparent;
+  backdrop-filter:blur(0px);
+  transition:background .4s,border-color .4s,backdrop-filter .4s;
+}
+#topnav.scrolled{background:rgba(6,12,22,.92);border-color:rgba(255,255,255,.06);backdrop-filter:blur(14px);}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;font-style:italic;color:var(--cream);}
+.nav-brand span{color:var(--gold);}
+.nav-cta{
+  background:var(--gold);color:var(--ink);
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.6rem 1.5rem;border:none;cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,168,67,.35);}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;position:relative;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:0 6vw;overflow:hidden;z-index:10;
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:linear-gradient(180deg,#030608 0%,#060c16 25%,#0d1e38 55%,#c85a18 82%,#7a2008 100%);
+}
+.hero-glow{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:90vw;height:280px;background:radial-gradient(ellipse,rgba(200,90,24,.35) 0%,transparent 70%);z-index:1;animation:gp 4s ease-in-out infinite;}
+@keyframes gp{0%,100%{opacity:.5;}50%{opacity:1;}}
+
+/* horizon city silhouette */
+.skyline{position:absolute;bottom:0;left:0;right:0;z-index:2;opacity:.12;}
+
+.hero-content{position:relative;z-index:5;max-width:860px;}
+
+.hero-kicker{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.3em;
+  color:var(--gold);text-transform:uppercase;
+  background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);
+  padding:.4rem 1.1rem;margin-bottom:2rem;
+  opacity:0;animation:sup .7s .2s ease forwards;
+}
+.hero-kicker::before{content:'✈';font-size:.8rem;}
+
+@keyframes sup{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.hero-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(3.5rem,10vw,8.5rem);
+  font-weight:900;line-height:.9;letter-spacing:-.03em;
+  color:var(--cream);
+  opacity:0;animation:sup .9s .4s ease forwards;
+}
+.hero-title em{font-style:italic;color:var(--gold);}
+.hero-title .amp{color:var(--rust);}
+
+.hero-deck{
+  font-family:'Playfair Display',serif;font-style:italic;
+  font-size:clamp(1rem,2.2vw,1.45rem);color:var(--muted);
+  max-width:600px;margin:1.75rem auto 0;line-height:1.5;
+  opacity:0;animation:sup .9s .65s ease forwards;
+}
+
+/* ── PRICE HERO ── */
+.price-hero{
+  display:inline-flex;flex-direction:column;align-items:center;
+  margin:2.5rem auto 0;
+  opacity:0;animation:sup .9s .85s ease forwards;
+}
+.price-was{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.2em;color:rgba(245,240,232,.3);text-transform:uppercase;text-decoration:line-through;margin-bottom:.25rem;}
+.price-now{font-family:'Playfair Display',serif;font-size:4rem;font-weight:900;color:var(--gold);line-height:1;}
+.price-note{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;margin-top:.3rem;}
+
+.hero-buy{
+  display:inline-flex;align-items:center;gap:.75rem;
+  background:var(--rust);color:var(--cream);
+  font-family:'DM Mono',monospace;font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;
+  padding:1.2rem 3rem;border:none;cursor:pointer;
+  margin-top:2rem;position:relative;overflow:hidden;
+  transition:transform .25s,box-shadow .25s;
+  opacity:0;animation:sup .9s 1.05s ease forwards;
+}
+.hero-buy::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,.1);transform:translateX(-100%);transition:transform .35s;}
+.hero-buy:hover{transform:translateY(-3px);box-shadow:0 16px 44px rgba(193,68,14,.5);}
+.hero-buy:hover::before{transform:translateX(0);}
+.hero-buy .arrow{font-size:1.1rem;transition:transform .25s;}
+.hero-buy:hover .arrow{transform:translateX(4px);}
+
+.hero-trust{
+  display:flex;justify-content:center;align-items:center;gap:2rem;flex-wrap:wrap;
+  margin-top:1.75rem;
+  opacity:0;animation:sup .9s 1.25s ease forwards;
+}
+.trust-item{
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;
+  color:rgba(245,240,232,.3);text-transform:uppercase;
+  display:flex;align-items:center;gap:.4rem;
+}
+.trust-item::before{content:'✓';color:var(--sage);}
+
+.scroll-cue{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:.4rem;opacity:0;animation:sup 1s 1.6s ease forwards;}
+.scroll-cue span{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.3em;color:rgba(255,255,255,.2);text-transform:uppercase;}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,rgba(212,168,67,.5),transparent);animation:scpulse 2s ease-in-out infinite;}
+@keyframes scpulse{0%,100%{transform:scaleY(1);opacity:1;}50%{transform:scaleY(.4);opacity:.2;}}
+
+/* ── SOCIAL PROOF TICKER ── */
+.ticker-wrap{
+  position:relative;z-index:10;
+  background:var(--rust);
+  padding:.7rem 0;overflow:hidden;
+  border-top:1px solid rgba(255,255,255,.1);border-bottom:1px solid rgba(255,255,255,.1);
+}
+.ticker-track{
+  display:flex;gap:0;white-space:nowrap;
+  animation:ticker 28s linear infinite;
+}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.ticker-item{
+  font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  color:rgba(245,240,232,.9);padding:0 2.5rem;
+  display:flex;align-items:center;gap:.6rem;
+}
+.ticker-item::before{content:'✈';color:rgba(245,240,232,.4);}
+
+/* ── SECTIONS ── */
+.sec{position:relative;z-index:10;padding:7rem 6vw;}
+.sec-tag{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;display:block;margin-bottom:1rem;}
+.sec-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3rem);font-weight:900;line-height:1.05;margin-bottom:.5rem;}
+.sec-sub{font-size:.95rem;color:var(--muted);line-height:1.7;margin-bottom:3rem;max-width:580px;}
+
+/* ── PROBLEM ── */
+.problem-sec{background:linear-gradient(180deg,#07090d 0%,#0d1e38 100%);}
+.pain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem;}
+.pain-card{
+  border:1px solid rgba(193,68,14,.25);padding:2rem 1.75rem;
+  position:relative;overflow:hidden;
+  opacity:0;transform:translateY(24px);transition:opacity .6s,transform .6s;
+}
+.pain-card.visible{opacity:1;transform:translateY(0);}
+.pain-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--rust);transform:scaleX(0);transform-origin:left;transition:transform .4s;}
+.pain-card:hover::before{transform:scaleX(1);}
+.pain-icon{font-size:1.8rem;margin-bottom:.9rem;display:block;}
+.pain-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--cream);margin-bottom:.5rem;}
+.pain-body{font-size:.85rem;color:rgba(245,240,232,.45);line-height:1.7;}
+
+/* ── WHAT YOU GET ── */
+.value-sec{background:#0a1525;}
+.value-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.04);}
+@media(max-width:680px){.value-grid{grid-template-columns:1fr;}}
+.val-card{
+  background:#080f1c;padding:2.5rem 2rem;
+  opacity:0;transform:translateX(-16px);transition:opacity .55s,transform .55s,background .3s;
+}
+.val-card.visible{opacity:1;transform:translateX(0);}
+.val-card:hover{background:#0f1e30;}
+.val-num{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:rgba(212,168,67,.06);line-height:1;margin-bottom:.25rem;}
+.val-icon{font-size:1.6rem;display:block;margin-bottom:.75rem;}
+.val-title{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--cream);margin-bottom:.5rem;}
+.val-body{font-size:.85rem;color:rgba(245,240,232,.45);line-height:1.7;}
+
+/* ── PEEK INSIDE ── */
+.peek-sec{background:linear-gradient(135deg,#07090d 0%,#0d1e38 100%);}
+.peek-chapters{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+.peek-ch{
+  border:1px solid rgba(255,255,255,.06);padding:1.5rem;
+  display:flex;align-items:flex-start;gap:1rem;
+  opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s,border-color .3s;
+}
+.peek-ch.visible{opacity:1;transform:translateY(0);}
+.peek-ch:hover{border-color:rgba(212,168,67,.3);}
+.peek-ch-num{
+  font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.15em;
+  color:var(--gold);min-width:28px;padding-top:.15rem;
+}
+.peek-ch-body{}
+.peek-ch-title{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--cream);margin-bottom:.3rem;}
+.peek-ch-desc{font-size:.78rem;color:rgba(245,240,232,.38);line-height:1.6;}
+
+/* blurred teaser chapters */
+.peek-locked{
+  filter:blur(4px);opacity:.35;pointer-events:none;
+  position:relative;
+}
+.peek-lock-badge{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.3);
+  font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;
+  color:var(--gold);padding:.3rem .7rem;text-transform:uppercase;
+  pointer-events:none;z-index:2;white-space:nowrap;
+}
+
+/* ── SOCIAL PROOF ── */
+.proof-sec{background:#060e1a;}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+.review-card{
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);
+  padding:2rem;
+  opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s;
+}
+.review-card.visible{opacity:1;transform:translateY(0);}
+.review-stars{color:var(--gold);font-size:.9rem;letter-spacing:.1em;margin-bottom:1rem;}
+.review-text{font-family:'Playfair Display',serif;font-style:italic;font-size:.95rem;color:rgba(245,240,232,.75);line-height:1.65;margin-bottom:1.25rem;}
+.review-author{display:flex;align-items:center;gap:.75rem;}
+.review-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--rust);display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;font-weight:700;color:white;font-family:'Playfair Display',serif;
+  flex-shrink:0;
+}
+.review-name{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.review-loc{font-size:.75rem;color:rgba(245,240,232,.25);}
+
+/* ── STATS ROW ── */
+.stats-sec{
+  background:var(--rust);
+  padding:4rem 6vw;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2rem;
+  text-align:center;
+}
+.stat-big{display:flex;flex-direction:column;gap:.4rem;}
+.stat-big-n{font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;color:var(--cream);line-height:1;}
+.stat-big-l{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.2em;color:rgba(245,240,232,.55);text-transform:uppercase;}
+
+/* ── FAQ ── */
+.faq-sec{background:#07090d;}
+.faq-list{max-width:700px;display:flex;flex-direction:column;gap:.75rem;}
+.faq-item{border:1px solid rgba(255,255,255,.06);overflow:hidden;}
+.faq-q{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:1.25rem 1.5rem;cursor:pointer;
+  font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--cream);
+  transition:background .2s;
+  user-select:none;
+}
+.faq-q:hover{background:rgba(255,255,255,.03);}
+.faq-arrow{color:var(--gold);font-size:.8rem;transition:transform .3s;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);}
+.faq-a{
+  max-height:0;overflow:hidden;
+  font-size:.88rem;color:rgba(245,240,232,.5);line-height:1.75;
+  padding:0 1.5rem;transition:max-height .4s ease,padding .3s;
+}
+.faq-item.open .faq-a{max-height:200px;padding:0 1.5rem 1.25rem;}
+
+/* ── FINAL CTA ── */
+.final-cta{
+  min-height:80vh;
+  background:linear-gradient(180deg,#07090d 0%,#0d1e38 35%,#c1440e 80%,#7a1a06 100%);
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  padding:7rem 6vw;position:relative;overflow:hidden;z-index:10;
+}
+.final-cta::after{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 40% at 50% 70%,rgba(212,168,67,.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.final-plane-bg{
+  position:absolute;font-size:22rem;opacity:.03;
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  pointer-events:none;animation:fpbg 25s linear infinite;
+}
+@keyframes fpbg{from{left:-20%;}to{left:120%;}}
+
+.fcta-inner{position:relative;z-index:2;}
+.fcta-eyebrow{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.35em;color:var(--gold);text-transform:uppercase;margin-bottom:1.25rem;opacity:0;transition:opacity .8s;}
+.fcta-eyebrow.visible{opacity:1;}
+.fcta-title{font-family:'Playfair Display',serif;font-size:clamp(2.8rem,6vw,5.5rem);font-weight:900;line-height:1;color:var(--cream);margin-bottom:1.5rem;opacity:0;transform:translateY(30px);transition:opacity .8s,transform .8s;}
+.fcta-title.visible{opacity:1;transform:translateY(0);}
+.fcta-title em{font-style:italic;color:var(--gold);}
+.fcta-sub{font-size:1rem;color:var(--muted);max-width:480px;margin:0 auto 2.5rem;line-height:1.7;opacity:0;transition:opacity .8s .15s;}
+.fcta-sub.visible{opacity:1;}
+
+.fcta-price-row{display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:2rem;opacity:0;transition:opacity .8s .25s;}
+.fcta-price-row.visible{opacity:1;}
+.fcta-was{font-family:'DM Mono',monospace;font-size:.85rem;color:rgba(245,240,232,.2);text-decoration:line-through;}
+.fcta-price{font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:var(--gold);line-height:1;}
+.fcta-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
+
+.buy-btn{
+  display:inline-flex;align-items:center;gap:.9rem;
+  background:var(--gold);color:var(--ink);
+  font-family:'DM Mono',monospace;font-size:.82rem;letter-spacing:.22em;text-transform:uppercase;
+  padding:1.3rem 3.5rem;border:none;cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:transform .25s,box-shadow .25s;
+  opacity:0;transition:opacity .8s .35s,transform .25s,box-shadow .25s;
+}
+.buy-btn.visible{opacity:1;}
+.buy-btn::before{content:'';position:absolute;inset:0;background:white;transform:translateX(-100%);transition:transform .35s;opacity:.15;}
+.buy-btn:hover{transform:translateY(-3px);box-shadow:0 18px 48px rgba(212,168,67,.4);}
+.buy-btn:hover::before{transform:translateX(0);}
+.buy-arrow{font-size:1.1rem;animation:barrow 1.5s ease-in-out infinite;}
+@keyframes barrow{0%,100%{transform:translateX(0);}50%{transform:translateX(5px);}}
+
+.fcta-micro{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;color:rgba(245,240,232,.2);text-transform:uppercase;margin-top:1.25rem;opacity:0;transition:opacity .8s .45s;}
+.fcta-micro.visible{opacity:1;}
+
+/* ── FOOTER ── */
+footer{background:#030406;padding:2rem 6vw;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;z-index:10;position:relative;border-top:1px solid rgba(255,255,255,.04);}
+.foot-brand{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;font-style:italic;color:var(--cream);}
+.foot-brand span{color:var(--gold);}
+.foot-copy{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;color:rgba(255,255,255,.12);text-transform:uppercase;}
+
+/* ── URGENCY BANNER ── */
+#urgency{
+  position:fixed;bottom:0;left:0;right:0;z-index:700;
+  background:rgba(7,9,13,.94);border-top:1px solid rgba(212,168,67,.2);
+  backdrop-filter:blur(14px);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;
+  padding:.9rem 6vw;
+  transform:translateY(100%);transition:transform .5s ease;
+}
+#urgency.show{transform:translateY(0);}
+.urg-text{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;}
+.urg-text strong{color:var(--gold);}
+.urg-buy{
+  background:var(--gold);color:var(--ink);
+  font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;
+  padding:.6rem 1.6rem;border:none;cursor:pointer;white-space:nowrap;
+  transition:transform .2s;
+}
+.urg-buy:hover{transform:scale(1.04);}
+.urg-close{background:none;border:none;color:rgba(245,240,232,.3);cursor:pointer;font-size:1rem;padding:0 .5rem;}
+
+@media(max-width:700px){
+  .hero-title{font-size:clamp(3rem,14vw,5rem);}
+  .sec{padding:5rem 5vw;}
+  .stats-sec{padding:3rem 5vw;}
+  footer{padding:2rem 5vw;}
+  #urgency{padding:.9rem 5vw;}
+  .value-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="cur-ring"></div>
+
+<!-- STARS / CLOUDS / PLANE -->
+<div id="stars"></div>
+<div id="clouds"><div class="cl cl1"></div><div class="cl cl2"></div><div class="cl cl3"></div></div>
+<div id="trail"></div>
+<div id="plane">
+  <svg class="psvg" viewBox="0 0 120 60" fill="none">
+    <ellipse cx="60" cy="30" rx="48" ry="10" fill="#f5f0e8"/>
+    <path d="M108 30 Q120 28 118 30 Q120 32 108 30Z" fill="#d4a843"/>
+    <path d="M18 30 L8 18 L20 24Z" fill="#c1440e"/>
+    <path d="M18 30 L8 42 L20 36Z" fill="#c1440e"/>
+    <path d="M55 28 L30 10 L38 28Z" fill="#d4a843"/>
+    <path d="M55 32 L30 50 L38 32Z" fill="#d4a843"/>
+    <path d="M28 28 L18 22 L24 28Z" fill="#c1440e"/>
+    <path d="M28 32 L18 38 L24 32Z" fill="#c1440e"/>
+    <circle cx="75" cy="27" r="3" fill="#2d6a8f" opacity=".8"/>
+    <circle cx="65" cy="27" r="3" fill="#2d6a8f" opacity=".8"/>
+    <circle cx="85" cy="28" r="2.5" fill="#2d6a8f" opacity=".6"/>
+    <ellipse cx="45" cy="22" rx="5" ry="3" fill="#d4a843" opacity=".6"/>
+    <ellipse cx="45" cy="38" rx="5" ry="3" fill="#d4a843" opacity=".6"/>
+  </svg>
+</div>
+
+<!-- NAV -->
+<nav id="topnav">
+  <div class="nav-brand">Broke <span>&amp;</span> Booked</div>
+  <button class="nav-cta" onclick="scrollToBuy()">Get it for $10 →</button>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-glow"></div>
+
+  <!-- SVG skyline silhouette -->
+  <svg class="skyline" viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <path d="M0,120 L0,80 L40,80 L40,50 L60,50 L60,30 L80,30 L80,50 L100,50 L100,60 L120,60 L120,40 L140,40 L140,20 L160,20 L160,40 L180,40 L180,60 L200,60 L200,45 L220,45 L220,25 L240,25 L240,45 L260,45 L260,70 L280,70 L280,50 L310,50 L310,30 L330,30 L330,10 L350,10 L350,30 L370,30 L370,50 L400,50 L400,65 L430,65 L430,40 L460,40 L460,55 L490,55 L490,35 L510,35 L510,55 L540,55 L540,70 L580,70 L580,45 L610,45 L610,25 L630,25 L630,45 L660,45 L660,60 L700,60 L700,40 L730,40 L730,20 L750,20 L750,40 L770,40 L770,55 L800,55 L800,70 L840,70 L840,50 L870,50 L870,30 L890,30 L890,50 L920,50 L920,65 L960,65 L960,45 L990,45 L990,60 L1020,60 L1020,40 L1050,40 L1050,20 L1070,20 L1070,40 L1100,40 L1100,55 L1130,55 L1130,70 L1160,70 L1160,50 L1190,50 L1190,35 L1210,35 L1210,55 L1240,55 L1240,70 L1280,70 L1280,50 L1310,50 L1310,30 L1330,30 L1330,50 L1360,50 L1360,65 L1400,65 L1400,80 L1440,80 L1440,120 Z" fill="white"/>
+  </svg>
+
+  <div class="hero-content">
+    <div class="hero-kicker">New Release · Digital eBook</div>
+    <h1 class="hero-title">
+      Broke<br>
+      <span class="amp">&amp;</span><br>
+      <em>Booked</em>
+    </h1>
+    <p class="hero-deck">The budget travel bible for your 20s &amp; 30s — 12 chapters, 50+ hacks, 30+ destinations, and an interactive flight calculator. All for less than a coffee.</p>
+
+    <div class="price-hero">
+      <span class="price-was">$47 value</span>
+      <span class="price-now">$10</span>
+      <span class="price-note">One-time · Instant download · Yours forever</span>
+    </div>
+
+    <button class="hero-buy" onclick="scrollToBuy()">
+      Get Instant Access <span class="arrow">→</span>
+    </button>
+
+    <div class="hero-trust">
+      <span class="trust-item">Instant PDF Download</span>
+      <span class="trust-item">Interactive Flight Calculator</span>
+      <span class="trust-item">200+ Pages</span>
+      <span class="trust-item">Lifetime Updates</span>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    <span>See what's inside</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ── TICKER ── -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker-track">
+    <span class="ticker-item">Vietnam from $620 round-trip</span>
+    <span class="ticker-item">Fly midweek &amp; save up to 25%</span>
+    <span class="ticker-item">Budapest from $490 right now</span>
+    <span class="ticker-item">Shoulder season = 40% off peak prices</span>
+    <span class="ticker-item">Mexico City from $250 from Dallas</span>
+    <span class="ticker-item">Book 6–8 weeks out for best fares</span>
+    <span class="ticker-item">Bali daily budget: just $40/day</span>
+    <span class="ticker-item">Georgia (Tbilisi): $28/day all-in</span>
+    <span class="ticker-item">Travel credit card can cover your flight free</span>
+    <span class="ticker-item">Vietnam from $620 round-trip</span>
+    <span class="ticker-item">Fly midweek &amp; save up to 25%</span>
+    <span class="ticker-item">Budapest from $490 right now</span>
+    <span class="ticker-item">Shoulder season = 40% off peak prices</span>
+    <span class="ticker-item">Mexico City from $250 from Dallas</span>
+    <span class="ticker-item">Book 6–8 weeks out for best fares</span>
+    <span class="ticker-item">Bali daily budget: just $40/day</span>
+    <span class="ticker-item">Georgia (Tbilisi): $28/day all-in</span>
+    <span class="ticker-item">Travel credit card can cover your flight free</span>
+  </div>
+</div>
+
+<!-- ══ PROBLEM ══ -->
+<section class="sec problem-sec">
+  <span class="sec-tag">Sound familiar?</span>
+  <h2 class="sec-title">You want to travel.<br>Something always gets in the way.</h2>
+  <p class="sec-sub">It's not that you can't afford it. It's that no one ever taught you the system.</p>
+  <div class="pain-grid">
+    <div class="pain-card">
+      <span class="pain-icon">😩</span>
+      <h3 class="pain-title">"I'll go when I have more money"</h3>
+      <p class="pain-body">The money never feels like enough. Meanwhile the trips stay on your vision board, not your passport.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">😤</span>
+      <h3 class="pain-title">"Flights are just too expensive"</h3>
+      <p class="pain-body">You've been checking prices wrong. There are routes and timing tricks that slash costs by 40–60%.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">😰</span>
+      <h3 class="pain-title">"I don't know how to budget for a trip"</h3>
+      <p class="pain-body">Nobody does — until they have a framework. This book gives you one that actually works for real life.</p>
+    </div>
+    <div class="pain-card">
+      <span class="pain-icon">🤯</span>
+      <h3 class="pain-title">"Travel is for people with good jobs"</h3>
+      <p class="pain-body">The highest earners aren't the most-traveled. The most-traveled have a system. Now you can too.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ WHAT YOU GET ══ -->
+<section class="sec value-sec">
+  <span class="sec-tag">What's Inside</span>
+  <h2 class="sec-title">Everything you need.<br>Nothing you don't.</h2>
+  <p class="sec-sub">200+ pages of zero-fluff, battle-tested budget travel knowledge built specifically for your generation.</p>
+  <div class="value-grid">
+    <div class="val-card">
+      <div class="val-num">12</div>
+      <span class="val-icon">📖</span>
+      <h3 class="val-title">12 Power-Packed Chapters</h3>
+      <p class="val-body">From money mindset and zero-based budgeting to flight hacking, travel rewards, remote income, and a full 90-day launch plan.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-num">✈</div>
+      <span class="val-icon">🧮</span>
+      <h3 class="val-title">Interactive Flight Calculator</h3>
+      <p class="val-body">Enter your destination, travel date, and savings — instantly get your daily / weekly / monthly savings plan to make that trip happen.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-num">30</div>
+      <span class="val-icon">🌍</span>
+      <h3 class="val-title">30+ Destinations Broken Down</h3>
+      <p class="val-body">Real daily budget estimates, best times to visit, and local cost breakdowns for 30+ countries across Asia, Europe, Latin America, and Africa.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-num">📅</div>
+      <span class="val-icon">📊</span>
+      <h3 class="val-title">Best-Time-to-Fly Charts</h3>
+      <p class="val-body">Month-by-month price guides by region so you always know when to book cheap and when to wait. Never overpay for flights again.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-num">50</div>
+      <span class="val-icon">💡</span>
+      <h3 class="val-title">50+ Budget Hacks</h3>
+      <p class="val-body">From house-sitting and travel credit card bonuses to hidden-city tickets and midweek booking windows — all legal, all tested.</p>
+    </div>
+    <div class="val-card">
+      <div class="val-num">∞</div>
+      <span class="val-icon">🔄</span>
+      <h3 class="val-title">Lifetime Updates</h3>
+      <p class="val-body">Travel prices and hacks change. You'll get every future update to this guide for free — forever. Pay once, benefit always.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PEEK INSIDE ══ -->
+<section class="sec peek-sec">
+  <span class="sec-tag">Chapter Preview</span>
+  <h2 class="sec-title">A look inside the guide</h2>
+  <p class="sec-sub">Here's a taste of the first 6 chapters — the rest unlocks when you grab your copy.</p>
+  <div class="peek-chapters">
+    <!-- Visible chapters -->
+    <div class="peek-ch">
+      <span class="peek-ch-num">CH 01</span>
+      <div class="peek-ch-body">
+        <h4 class="peek-ch-title">The Money Mindset Reset</h4>
+        <p class="peek-ch-desc">Unlearn the 3 financial myths keeping you grounded and build an abundance mindset around travel.</p>
+      </div>
+    </div>
+    <div class="peek-ch">
+      <span class="peek-ch-num">CH 02</span>
+      <div class="peek-ch-body">
+        <h4 class="peek-ch-title">Build Your Budget Blueprint</h4>
+        <p class="peek-ch-desc">The 50/30/20 travel remix — a zero-based budget that actually accounts for adventures, not just bills.</p>
+      </div>
+    </div>
+    <div class="peek-ch">
+      <span class="peek-ch-num">CH 03</span>
+      <div class="peek-ch-body">
+        <h4 class="peek-ch-title">Cut the Right Things</h4>
+        <p class="peek-ch-desc">The "joy audit" method for finding exactly which expenses to kill — without feeling deprived.</p>
+      </div>
+    </div>
+    <div class="peek-ch">
+      <span class="peek-ch-num">CH 04</span>
+      <div class="peek-ch-body">
+        <h4 class="peek-ch-title">Flight Hacking 101</h4>
+        <p class="peek-ch-desc">Find flights for 60–80% less. Fare alerts, hidden-city tickets, and the best booking windows explained.</p>
+      </div>
+    </div>
+    <div class="peek-ch">
+      <span class="peek-ch-num">CH 05</span>
+      <div class="peek-ch-body">
+        <h4 class="peek-ch-title">Sleep Cheap, Sleep Well</h4>
+        <p class="peek-ch-desc">Hostels, house-sitting, home exchanges — every option vetted and honestly reviewed.</p>
+      </div>
+    </div>
+    <div class="peek-ch">
+      <span class="peek-ch-num">CH 06</span>
+      <div class="peek-ch-body">
+        <h4 class="peek-ch-title">Eat Like a Local</h4>
+        <p class="peek-ch-desc">Market strategy, street food safety, and why learning to cook one dish per country saves you hundreds.</p>
+      </div>
+    </div>
+    <!-- Locked chapters -->
+    <div class="peek-ch peek-locked" style="position:relative;">
+      <span class="peek-ch-num">CH 07</span>
+      <div class="peek-ch-body"><h4 class="peek-ch-title">Travel Cards &amp; Rewards</h4><p class="peek-ch-desc">Use points and miles to fund entire trips legally.</p></div>
+    </div>
+    <div class="peek-ch peek-locked" style="position:relative;">
+      <span class="peek-ch-num">CH 08</span>
+      <div class="peek-ch-body"><h4 class="peek-ch-title">Slow Travel &amp; Geo-Arbitrage</h4><p class="peek-ch-desc">Stay longer, spend less. The best geo-arbitrage countries right now.</p></div>
+    </div>
+    <div class="peek-ch peek-locked" style="position:relative;">
+      <span class="peek-ch-num">CH 09</span>
+      <div class="peek-ch-body"><h4 class="peek-ch-title">Fund Your Travels Remotely</h4><p class="peek-ch-desc">The side hustles that actually pay for travel.</p></div>
+    </div>
+    <div class="peek-ch peek-locked" style="position:relative;">
+      <span class="peek-ch-num">CH 10–12</span>
+      <div class="peek-ch-body"><h4 class="peek-ch-title">+ 3 More Chapters</h4><p class="peek-ch-desc">Insurance, packing light, and your full 90-day launch plan.</p></div>
+    </div>
+  </div>
+  <div style="margin-top:2.5rem;text-align:center;">
+    <button class="hero-buy" onclick="scrollToBuy()" style="opacity:1;animation:none;">
+      Unlock All 12 Chapters — $10 <span class="arrow">→</span>
+    </button>
+  </div>
+</section>
+
+<!-- ══ STATS ══ -->
+<div class="stats-sec">
+  <div class="stat-big"><span class="stat-big-n" data-count="200">0</span><span class="stat-big-l">Pages of Content</span></div>
+  <div class="stat-big"><span class="stat-big-n" data-count="50">0</span><span class="stat-big-l">Budget Hacks</span></div>
+  <div class="stat-big"><span class="stat-big-n" data-count="30">0</span><span class="stat-big-l">Destinations Covered</span></div>
+  <div class="stat-big"><span class="stat-big-n">$10</span><span class="stat-big-l">One-Time Price</span></div>
+</div>
+
+<!-- ══ SOCIAL PROOF ══ -->
+<section class="sec proof-sec">
+  <span class="sec-tag">Reader Reviews</span>
+  <h2 class="sec-title">Real people.<br>Real trips planned.</h2>
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"I used the flight calculator and figured out I needed to save just $38 a week to afford Lisbon by October. I booked my tickets last Tuesday. This guide is insane value."</p>
+      <div class="review-author">
+        <div class="review-avatar">J</div>
+        <div><div class="review-name">Jasmine T.</div><div class="review-loc">Atlanta, GA · Booked Lisbon 🇵🇹</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Chapter 4 alone saved me $340 on my flight to Bangkok. The hidden-city ticketing section blew my mind. I've already told 5 friends to grab this."</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:#2d6a8f;">M</div>
+        <div><div class="review-name">Marcus R.</div><div class="review-loc">Chicago, IL · Currently in Thailand 🇹🇭</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"I was drowning in subscriptions and thought I couldn't afford to travel. The joy audit in chapter 3 freed up $210/month I didn't know I had. Bali trip booked."</p>
+      <div class="review-author">
+        <div class="review-avatar" style="background:#4a7a55;">S</div>
+        <div><div class="review-name">Sofia K.</div><div class="review-loc">New York, NY · Booked Bali 🇮🇩</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FAQ ══ -->
+<section class="sec faq-sec">
+  <span class="sec-tag">Questions</span>
+  <h2 class="sec-title" style="margin-bottom:2.5rem;">Common questions</h2>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q">What format is the eBook? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">You get an instant PDF download + access to the interactive HTML version with the flight calculator, charts, and animations. Works on any device.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Is this only for solo travelers? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">Not at all. The flight calculator supports 1–4 travelers and the budgeting system works for couples, friends, and small groups too.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Are the prices in the guide up to date? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">All pricing data reflects 2025 averages. Because you get lifetime updates, you'll always receive the latest version whenever we refresh the numbers.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">I've never traveled internationally. Is this for beginners? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">Absolutely. Chapter 12 is literally a 90-day step-by-step plan for your very first trip. It assumes zero prior travel experience.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Why is it only $10? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">Because the goal is to get this into as many hands as possible. The information in here can save you hundreds — even thousands — on your first trip alone. $10 felt fair.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FINAL CTA ══ -->
+<section class="final-cta" id="buy-section">
+  <div class="final-plane-bg">✈</div>
+  <div class="fcta-inner">
+    <p class="fcta-eyebrow">Ready to go?</p>
+    <h2 class="fcta-title">Stop planning.<br>Start <em>flying.</em></h2>
+    <p class="fcta-sub">Everything you need to take your first (or next) budget trip is inside. For the price of a coffee.</p>
+
+    <div class="fcta-price-row">
+      <span class="fcta-was">$47</span>
+      <span class="fcta-price">$10</span>
+      <span class="fcta-label">one-time · instant download</span>
+    </div>
+
+    <button class="buy-btn" onclick="alert('Connect this to your Gumroad or Lemon Squeezy link to accept payments!')">
+      Get Broke &amp; Booked Now <span class="buy-arrow">→</span>
+    </button>
+
+    <p class="fcta-micro">PDF + Interactive Version · Lifetime Updates · Instant Delivery</p>
+  </div>
+</section>
+
+<footer>
+  <div class="foot-brand">Broke <span>&amp;</span> Booked</div>
+  <div class="foot-copy">© 2025 · Digital Edition · All Rights Reserved</div>
+</footer>
+
+<!-- URGENCY BOTTOM BAR -->
+<div id="urgency">
+  <p class="urg-text">✈ <strong>Get Broke &amp; Booked</strong> — Interactive eBook · Instant Download · <strong>Only $10</strong></p>
+  <button class="urg-buy" onclick="scrollToBuy()">Grab it for $10 →</button>
+  <button class="urg-close" onclick="document.getElementById('urgency').remove()">✕</button>
+</div>
+
+<script>
+// ── CURSOR ──
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function a(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a);})();
+document.querySelectorAll('button,.faq-q,.pain-card,.val-card,.review-card,.peek-ch').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cur.style.width='20px';cur.style.height='20px';ring.style.width='50px';ring.style.height='50px';});
+  el.addEventListener('mouseleave',()=>{cur.style.width='10px';cur.style.height='10px';ring.style.width='32px';ring.style.height='32px';});
+});
+
+// ── SCROLL EFFECTS ──
+const nav=document.getElementById('topnav'),urg=document.getElementById('urgency');
+window.addEventListener('scroll',()=>{
+  nav.classList.toggle('scrolled',window.scrollY>60);
+  urg.classList.toggle('show',window.scrollY>400);
+});
+
+// ── PLANE TRAIL ──
+const pl=document.getElementById('plane'),tr=document.getElementById('trail');
+function spawnTrail(){
+  const r=pl.getBoundingClientRect();
+  if(r.left>-150&&r.left<window.innerWidth+150){
+    const d=document.createElement('div');d.className='tdot';
+    d.style.left=(r.left+8)+'px';d.style.top=(r.top+r.height/2)+'px';
+    tr.appendChild(d);setTimeout(()=>d.remove(),2800);
+  }
+}
+setInterval(spawnTrail,110);
+
+// ── STARS ──
+const se=document.getElementById('stars');
+for(let i=0;i<90;i++){
+  const s=document.createElement('div');s.className='star';
+  const sz=Math.random()*2+.4;
+  s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*60}%;--o:${(Math.random()*.6+.1).toFixed(2)};--d:${(Math.random()*3+1.5).toFixed(1)}s;--dl:-${(Math.random()*5).toFixed(1)}s;`;
+  se.appendChild(s);
+}
+
+// ── INTERSECTION OBSERVER ──
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    const el=e.target;
+    el.classList.add('visible');
+    if(el.dataset.count){
+      const target=parseInt(el.dataset.count),dur=1400;
+      let v=0;const step=target/(dur/16);
+      const t=setInterval(()=>{v+=step;if(v>=target){v=target;clearInterval(t);}el.textContent=Math.floor(v)+(target>=50?'+':'');},16);
+    }
+    io.unobserve(el);
+  });
+},{threshold:.15});
+
+document.querySelectorAll('.pain-card,.val-card,.review-card,.peek-ch,.fcta-eyebrow,.fcta-title,.fcta-sub,.fcta-price-row,.buy-btn,.fcta-micro,[data-count]').forEach(el=>io.observe(el));
+
+// stagger delays
+document.querySelectorAll('.pain-card').forEach((c,i)=>c.style.transitionDelay=(i*.1)+'s');
+document.querySelectorAll('.val-card').forEach((c,i)=>c.style.transitionDelay=(i*.08)+'s');
+document.querySelectorAll('.review-card').forEach((c,i)=>c.style.transitionDelay=(i*.12)+'s');
+document.querySelectorAll('.peek-ch:not(.peek-locked)').forEach((c,i)=>c.style.transitionDelay=(i*.07)+'s');
+
+// ── FAQ ──
+document.querySelectorAll('.faq-q').forEach(q=>{
+  q.addEventListener('click',()=>{
+    const item=q.parentElement;
+    const isOpen=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!isOpen)item.classList.add('open');
+  });
+});
+
+// ── SCROLL TO BUY ──
+function scrollToBuy(){
+  document.getElementById('buy-section').scrollIntoView({behavior:'smooth'});
+}
+</script>
+</body>
+</html>
